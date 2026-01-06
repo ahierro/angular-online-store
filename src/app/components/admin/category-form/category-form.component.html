@@ -1,0 +1,76 @@
+<div class="form-container">
+  <h1>{{ editMode() ? 'Edit Category' : 'Create Category' }}</h1>
+
+  @if (error()) {
+    <div class="error-message" role="alert">
+      {{ error() }}
+    </div>
+  }
+
+  <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label for="id">Category ID</label>
+      <input
+        id="id"
+        type="text"
+        formControlName="id"
+        [disabled]="editMode()"
+        [class.error]="categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched"
+        required
+      />
+      @if (categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched) {
+        <span class="field-error">Category ID is required</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="name">Category Name</label>
+      <input
+        id="name"
+        type="text"
+        formControlName="name"
+        [class.error]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+        required
+      />
+      @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+        <span class="field-error">Category name is required</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        rows="4"
+        [class.error]="categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched"
+        required
+      ></textarea>
+      @if (categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched) {
+        <span class="field-error">Description is required</span>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button
+        type="submit"
+        [disabled]="categoryForm.invalid || loading()"
+        class="btn-submit"
+      >
+        @if (loading()) {
+          <span>{{ editMode() ? 'Updating...' : 'Creating...' }}</span>
+        } @else {
+          <span>{{ editMode() ? 'Update Category' : 'Create Category' }}</span>
+        }
+      </button>
+      <button
+        type="button"
+        (click)="router.navigate(['/admin/categories'])"
+        class="btn-cancel"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>
+

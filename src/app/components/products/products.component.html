@@ -1,0 +1,137 @@
+<div class="products-container">
+  <div class="filters">
+    <div class="search-bar">
+      <input
+        type="text"
+        placeholder="Search products..."
+        [value]="search()"
+        (input)="onSearchChange($any($event.target).value)"
+        class="search-input"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="category">Category:</label>
+      <select
+        id="category"
+        [value]="selectedCategory() || ''"
+        (change)="onCategoryChange($any($event.target).value)"
+        class="filter-select"
+      >
+        <option value="">All Categories</option>
+        @for (category of categoriesList(); track category.id) {
+          <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="sort">Sort by Price:</label>
+      <select
+        id="sort"
+        [value]="sort() || ''"
+        (change)="onSortChange($any($event.target).value)"
+        class="filter-select"
+      >
+        <option value="">None</option>
+        <option value="ASC">Price: Low to High</option>
+        <option value="DESC">Price: High to Low</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <div class="products-grid">
+      @if (loading()) {
+        <div class="loading">Loading products...</div>
+      } @else {
+        @for (product of productsList(); track product.productId) {
+          <div class="product-card">
+            <img [src]="product.smallImageUrl" [alt]="product.productName" class="product-image" />
+            <div class="product-info">
+              <h3>{{ product.productName }}</h3>
+              <p class="product-description">{{ product.productDescription }}</p>
+              <div class="product-meta">
+                <span class="product-category">{{ product.category.name }}</span>
+                <span class="product-stock">Stock: {{ product.stock }}</span>
+              </div>
+              <div class="product-footer">
+                <span class="product-price">${{ product.price | number: '1.2-2' }}</span>
+                <button
+                  (click)="addToCart(product)"
+                  [disabled]="product.stock === 0"
+                  class="btn-add-cart"
+                >
+                  {{ product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <div class="empty">No products found</div>
+        }
+      }
+    </div>
+
+    <div class="cart-sidebar">
+      <h2>Cart ({{ cartItemCount() }})</h2>
+      @if (cartItems().length === 0) {
+        <p class="empty-cart">Your cart is empty</p>
+      } @else {
+        <div class="cart-items">
+          @for (item of cartItems(); track item.product.productId) {
+            <div class="cart-item">
+              <div class="cart-item-info">
+                <h4>{{ item.product.productName }}</h4>
+                <p>${{ item.product.price | number: '1.2-2' }} each</p>
+              </div>
+              <div class="cart-item-controls">
+                <input
+                  type="number"
+                  [value]="item.quantity"
+                  (input)="updateQuantity(item.product.productId, +$any($event.target).value)"
+                  min="1"
+                  [max]="item.product.stock"
+                  class="quantity-input"
+                />
+                <button (click)="removeFromCart(item.product.productId)" class="btn-remove">
+                  Remove
+                </button>
+              </div>
+              <div class="cart-item-total">
+                ${{ (item.product.price * item.quantity) | number: '1.2-2' }}
+              </div>
+            </div>
+          }
+        </div>
+        <div class="cart-footer">
+          <div class="cart-total">
+            <strong>Total: ${{ cartTotal() | number: '1.2-2' }}</strong>
+          </div>
+          <a routerLink="/checkout" class="btn-checkout">Checkout</a>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (total() > 1) {
+    <div class="pagination">
+      <button
+        (click)="goToPage(page() - 1)"
+        [disabled]="page() === 0"
+        class="btn-page"
+      >
+        Previous
+      </button>
+      <span>Page {{ page() + 1 }} of {{ total() }}</span>
+      <button
+        (click)="goToPage(page() + 1)"
+        [disabled]="page() >= total() - 1"
+        class="btn-page"
+      >
+        Next
+      </button>
+    </div>
+  }
+</div>
+

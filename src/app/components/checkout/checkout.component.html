@@ -1,0 +1,53 @@
+<div class="checkout-container">
+  <h1>Checkout</h1>
+
+  @if (error()) {
+    <div class="error-message" role="alert">
+      {{ error() }}
+    </div>
+  }
+
+  @if (success()) {
+    <div class="success-message" role="alert">
+      {{ success() }}
+    </div>
+  }
+
+  <div class="checkout-content">
+    <div class="order-summary">
+      <h2>Order Summary</h2>
+      <div class="order-items">
+        @for (item of cartItems(); track item.product.productId) {
+          <div class="order-item">
+            <div class="item-info">
+              <h3>{{ item.product.productName }}</h3>
+              <p>Quantity: {{ item.quantity }}</p>
+            </div>
+            <div class="item-price">
+              ${{ (item.product.price * item.quantity) | number: '1.2-2' }}
+            </div>
+          </div>
+        }
+      </div>
+      <div class="order-total">
+        <strong>Total: ${{ total() | number: '1.2-2' }}</strong>
+      </div>
+    </div>
+
+    <div class="checkout-actions">
+      <button
+        (click)="createOrder()"
+        [disabled]="loading() || cartItems().length === 0"
+        class="btn-submit-order"
+      >
+        @if (loading()) {
+          <span>Creating Order...</span>
+        } @else {
+          <span>Place Order</span>
+        }
+      </button>
+      <a routerLink="/products" class="btn-cancel">Back to Products</a>
+    </div>
+  </div>
+</div>
+
