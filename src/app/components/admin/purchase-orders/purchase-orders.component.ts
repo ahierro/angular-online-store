@@ -20,6 +20,7 @@ export class AdminPurchaseOrdersComponent implements OnInit {
   private selectedOrder = signal<PurchaseOrderDTO | null>(null);
   private showModal = signal(false);
   private isUpdatingStatus = signal(false);
+  private isLoadingOrderDetails = signal(false);
 
   ordersList = this.purchaseOrders.asReadonly();
   page = this.currentPage.asReadonly();
@@ -28,6 +29,7 @@ export class AdminPurchaseOrdersComponent implements OnInit {
   selected = this.selectedOrder.asReadonly();
   modalVisible = this.showModal.asReadonly();
   updatingStatus = this.isUpdatingStatus.asReadonly();
+  loadingOrderDetails = this.isLoadingOrderDetails.asReadonly();
 
   ngOnInit(): void {
     this.loadPurchaseOrders();
@@ -54,8 +56,20 @@ export class AdminPurchaseOrdersComponent implements OnInit {
   }
 
   openOrderDetails(order: PurchaseOrderDTO): void {
-    this.selectedOrder.set(order);
+    this.isLoadingOrderDetails.set(true);
     this.showModal.set(true);
+    this.selectedOrder.set(null);
+
+    this.purchaseOrderService.getPurchaseOrder(order.id).subscribe({
+      next: (orderDetails) => {
+        this.selectedOrder.set(orderDetails);
+        this.isLoadingOrderDetails.set(false);
+      },
+      error: () => {
+        this.isLoadingOrderDetails.set(false);
+        this.closeModal();
+      }
+    });
   }
 
   closeModal(): void {
@@ -71,12 +85,13 @@ export class AdminPurchaseOrdersComponent implements OnInit {
         next: () => {
           this.isUpdatingStatus.set(false);
           this.loadPurchaseOrders();
-          // Update selected order if it's the one being updated
+          // Refresh selected order if it's the one being updated
           const currentSelected = this.selectedOrder();
           if (currentSelected && currentSelected.id === orderId) {
-            this.selectedOrder.set({
-              ...currentSelected,
-              status: newStatus
+            this.purchaseOrderService.getPurchaseOrder(orderId).subscribe({
+              next: (updatedOrder) => {
+                this.selectedOrder.set(updatedOrder);
+              }
             });
           }
         },

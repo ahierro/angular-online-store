@@ -86,26 +86,49 @@
   }
 </div>
 
-@if (modalVisible() && selected(); as order) {
+@if (modalVisible()) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h2>Order Details - {{ order.id }}</h2>
+        <h2>
+          @if (selected()) {
+            Order Details - {{ selected()!.id }}
+          } @else {
+            Order Details
+          }
+        </h2>
         <button (click)="closeModal()" class="btn-close" aria-label="Close modal">×</button>
       </div>
       <div class="modal-body">
+        @if (loadingOrderDetails()) {
+          <div class="loading">Loading order details...</div>
+        } @else if (selected(); as order) {
         <div class="order-info">
-          <div class="info-row">
-            <strong>Customer:</strong>
-            <span>
-              @if (order.user) {
-                {{ order.user.firstName }} {{ order.user.lastName }}
-                ({{ order.user.email }})
-              } @else {
-                N/A
-              }
-            </span>
-          </div>
+          <h3>Customer Information</h3>
+          @if (order.user) {
+            <div class="user-details">
+              <div class="info-row">
+                <strong>Username:</strong>
+                <span>{{ order.user.username }}</span>
+              </div>
+              <div class="info-row">
+                <strong>Name:</strong>
+                <span>{{ order.user.firstName }} {{ order.user.lastName }}</span>
+              </div>
+              <div class="info-row">
+                <strong>Email:</strong>
+                <span>{{ order.user.email }}</span>
+              </div>
+            </div>
+          } @else {
+            <div class="info-row">
+              <strong>Customer:</strong>
+              <span>N/A</span>
+            </div>
+          }
+        </div>
+        <div class="order-info">
+          <h3>Order Information</h3>
           <div class="info-row">
             <strong>Status:</strong>
             <span>{{ order.status }}</span>
@@ -125,10 +148,16 @@
         <div class="items-list">
           @for (line of order.lines; track line.product.productId) {
             <div class="item-row">
+              <div class="item-image">
+                <img [src]="line.product.smallImageUrl" [alt]="line.product.productName" />
+              </div>
               <div class="item-info">
                 <h4>{{ line.product.productName }}</h4>
                 <p>{{ line.product.productDescription }}</p>
                 <span class="item-category">{{ line.product.category.name }}</span>
+                <div class="item-meta">
+                  <span class="item-id">ID: {{ line.product.productId }}</span>
+                </div>
               </div>
               <div class="item-quantity">
                 <strong>Quantity:</strong> {{ line.quantity }}
@@ -142,6 +171,7 @@
             </div>
           }
         </div>
+        }
       </div>
     </div>
   </div>

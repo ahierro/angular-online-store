@@ -184,6 +184,18 @@ th {
   border-bottom: 2px solid #eee;
 }
 
+.order-info h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
 .info-row {
   display: flex;
   justify-content: space-between;
@@ -192,6 +204,7 @@ th {
 
 .info-row strong {
   color: #333;
+  min-width: 120px;
 }
 
 .modal-body h3 {
@@ -207,12 +220,26 @@ th {
 
 .item-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template-columns: 100px 2fr 1fr 1fr 1fr;
   gap: 1rem;
   padding: 1rem;
   background-color: #f9f9f9;
   border-radius: 4px;
   align-items: start;
+}
+
+.item-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .item-info h4 {
@@ -233,6 +260,16 @@ th {
   color: white;
   border-radius: 4px;
   font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.item-meta {
+  margin-top: 0.5rem;
+}
+
+.item-id {
+  font-size: 0.75rem;
+  color: #999;
 }
 
 .item-quantity,
@@ -257,8 +294,14 @@ th {
 
 @media (max-width: 768px) {
   .item-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: 80px 1fr;
     gap: 0.5rem;
+  }
+
+  .item-quantity,
+  .item-price,
+  .item-total {
+    grid-column: 2;
   }
 
   .info-row {
