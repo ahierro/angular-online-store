@@ -2,6 +2,7 @@ import { Component, signal, ChangeDetectionStrategy, OnInit, inject } from '@ang
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CategoryService } from '../../../services/category.service';
+import { AlertService } from '../../../services/alert.service';
 import { CategoryDTO } from '../../../models/api.models';
 
 @Component({
@@ -13,16 +14,21 @@ import { CategoryDTO } from '../../../models/api.models';
 })
 export class AdminCategoriesComponent implements OnInit {
   private categoryService = inject(CategoryService);
+  private alertService = inject(AlertService);
 
   private categories = signal<CategoryDTO[]>([]);
   private currentPage = signal(0);
   private totalPages = signal(0);
   private isLoading = signal(false);
+  private showDeleteModal = signal(false);
+  private itemToDelete = signal<{ id: string; name: string } | null>(null);
 
   categoriesList = this.categories.asReadonly();
   page = this.currentPage.asReadonly();
   total = this.totalPages.asReadonly();
   loading = this.isLoading.asReadonly();
+  deleteModalVisible = this.showDeleteModal.asReadonly();
+  deleteItem = this.itemToDelete.asReadonly();
 
   ngOnInit(): void {
     this.loadCategories();
@@ -48,14 +54,33 @@ export class AdminCategoriesComponent implements OnInit {
       });
   }
 
-  deleteCategory(id: string): void {
-    if (confirm('Are you sure you want to delete this category?')) {
-      this.categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          this.loadCategories();
-        }
-      });
+  openDeleteModal(category: CategoryDTO): void {
+    this.itemToDelete.set({ id: category.id, name: category.name });
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+    this.itemToDelete.set(null);
+  }
+
+  confirmDelete(): void {
+    const item = this.itemToDelete();
+    if (!item) {
+      return;
     }
+
+    this.categoryService.deleteCategory(item.id).subscribe({
+      next: () => {
+        this.alertService.success('Category deleted successfully');
+        this.closeDeleteModal();
+        this.loadCategories();
+      },
+      error: () => {
+        this.alertService.error('Failed to delete category');
+        this.closeDeleteModal();
+      }
+    });
   }
 
   goToPage(page: number): void {

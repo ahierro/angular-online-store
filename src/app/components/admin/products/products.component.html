@@ -36,7 +36,7 @@
                   <td>{{ product.stock }}</td>
                   <td>
                     <a [routerLink]="['/admin/products', product.productId, 'edit']" class="btn btn-sm btn-outline-primary me-2">Edit</a>
-                    <button (click)="deleteProduct(product.productId)" class="btn btn-sm btn-danger">Delete</button>
+                    <button (click)="openDeleteModal(product)" class="btn btn-sm btn-danger">Delete</button>
                   </td>
                 </tr>
               } @empty {
@@ -79,4 +79,25 @@
     }
   }
 </div>
+
+@if (deleteModalVisible()) {
+  <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" (click)="closeDeleteModal()">
+    <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Delete</h5>
+          <button type="button" class="btn-close" (click)="closeDeleteModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete the product <strong>{{ deleteItem()?.name }}</strong>?</p>
+          <p class="text-muted small mb-0">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
 

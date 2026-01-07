@@ -2,6 +2,7 @@ import { Component, signal, ChangeDetectionStrategy, OnInit, inject } from '@ang
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../../services/product.service';
+import { AlertService } from '../../../services/alert.service';
 import { ProductDTO } from '../../../models/api.models';
 
 @Component({
@@ -13,16 +14,21 @@ import { ProductDTO } from '../../../models/api.models';
 })
 export class AdminProductsComponent implements OnInit {
   private productService = inject(ProductService);
+  private alertService = inject(AlertService);
 
   private products = signal<ProductDTO[]>([]);
   private currentPage = signal(0);
   private totalPages = signal(0);
   private isLoading = signal(false);
+  private showDeleteModal = signal(false);
+  private itemToDelete = signal<{ id: string; name: string } | null>(null);
 
   productsList = this.products.asReadonly();
   page = this.currentPage.asReadonly();
   total = this.totalPages.asReadonly();
   loading = this.isLoading.asReadonly();
+  deleteModalVisible = this.showDeleteModal.asReadonly();
+  deleteItem = this.itemToDelete.asReadonly();
 
   ngOnInit(): void {
     this.loadProducts();
@@ -48,14 +54,33 @@ export class AdminProductsComponent implements OnInit {
       });
   }
 
-  deleteProduct(id: string): void {
-    if (confirm('Are you sure you want to delete this product?')) {
-      this.productService.deleteProduct(id).subscribe({
-        next: () => {
-          this.loadProducts();
-        }
-      });
+  openDeleteModal(product: ProductDTO): void {
+    this.itemToDelete.set({ id: product.productId, name: product.productName });
+    this.showDeleteModal.set(true);
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal.set(false);
+    this.itemToDelete.set(null);
+  }
+
+  confirmDelete(): void {
+    const item = this.itemToDelete();
+    if (!item) {
+      return;
     }
+
+    this.productService.deleteProduct(item.id).subscribe({
+      next: () => {
+        this.alertService.success('Product deleted successfully');
+        this.closeDeleteModal();
+        this.loadProducts();
+      },
+      error: () => {
+        this.alertService.error('Failed to delete product');
+        this.closeDeleteModal();
+      }
+    });
   }
 
   goToPage(page: number): void {
