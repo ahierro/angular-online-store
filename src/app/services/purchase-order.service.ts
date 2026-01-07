@@ -5,6 +5,7 @@ import {
   PurchaseOrderDTO,
   PurchaseOrderCreationDTO,
   PurchaseOrderPage,
+  PurchaseOrderStatusUpdateDTO,
   PageRequestDTO
 } from '../models/api.models';
 
@@ -30,6 +31,10 @@ export class PurchaseOrderService {
       .set('size', request.size.toString());
 
     return this.http.get<PurchaseOrderPage>(`${this.API_URL}/page`, { params });
+  }
+
+  updatePurchaseOrderStatus(id: string, statusUpdate: PurchaseOrderStatusUpdateDTO): Observable<void> {
+    return this.http.patch<void>(`${this.API_URL}/${id}/status`, statusUpdate);
   }
 }
 

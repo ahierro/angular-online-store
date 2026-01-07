@@ -1,0 +1,149 @@
+<div class="admin-container">
+  <div class="header">
+    <h1>Purchase Orders Management</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Loading purchase orders...</div>
+  } @else {
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of ordersList(); track order.id) {
+            <tr>
+              <td>{{ order.id }}</td>
+              <td>
+                @if (order.user) {
+                  {{ order.user.firstName }} {{ order.user.lastName }}
+                } @else {
+                  N/A
+                }
+              </td>
+              <td>${{ order.total | number: '1.2-2' }}</td>
+              <td>
+                <select
+                  [value]="order.status"
+                  (change)="updateStatus(order.id, $any($event.target).value)"
+                  [disabled]="updatingStatus()"
+                  class="status-select"
+                >
+                  <option value="PENDING">PENDING</option>
+                  <option value="PROCESSING">PROCESSING</option>
+                  <option value="SHIPPED">SHIPPED</option>
+                  <option value="DELIVERED">DELIVERED</option>
+                  <option value="CANCELLED">CANCELLED</option>
+                </select>
+              </td>
+              <td>
+                @if (order.createdAt) {
+                  {{ order.createdAt | date: 'short' }}
+                } @else {
+                  N/A
+                }
+              </td>
+              <td class="actions">
+                <button (click)="openOrderDetails(order)" class="btn-view">View Items</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="empty">No purchase orders found</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (total() > 1) {
+      <div class="pagination">
+        <button
+          (click)="goToPage(page() - 1)"
+          [disabled]="page() === 0"
+          class="btn-page"
+        >
+          Previous
+        </button>
+        <span>Page {{ page() + 1 }} of {{ total() }}</span>
+        <button
+          (click)="goToPage(page() + 1)"
+          [disabled]="page() >= total() - 1"
+          class="btn-page"
+        >
+          Next
+        </button>
+      </div>
+    }
+  }
+</div>
+
+@if (modalVisible() && selected(); as order) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Order Details - {{ order.id }}</h2>
+        <button (click)="closeModal()" class="btn-close" aria-label="Close modal">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="order-info">
+          <div class="info-row">
+            <strong>Customer:</strong>
+            <span>
+              @if (order.user) {
+                {{ order.user.firstName }} {{ order.user.lastName }}
+                ({{ order.user.email }})
+              } @else {
+                N/A
+              }
+            </span>
+          </div>
+          <div class="info-row">
+            <strong>Status:</strong>
+            <span>{{ order.status }}</span>
+          </div>
+          <div class="info-row">
+            <strong>Total:</strong>
+            <span>${{ order.total | number: '1.2-2' }}</span>
+          </div>
+          @if (order.createdAt) {
+            <div class="info-row">
+              <strong>Created:</strong>
+              <span>{{ order.createdAt | date: 'short' }}</span>
+            </div>
+          }
+        </div>
+        <h3>Order Items</h3>
+        <div class="items-list">
+          @for (line of order.lines; track line.product.productId) {
+            <div class="item-row">
+              <div class="item-info">
+                <h4>{{ line.product.productName }}</h4>
+                <p>{{ line.product.productDescription }}</p>
+                <span class="item-category">{{ line.product.category.name }}</span>
+              </div>
+              <div class="item-quantity">
+                <strong>Quantity:</strong> {{ line.quantity }}
+              </div>
+              <div class="item-price">
+                <strong>Price:</strong> ${{ line.product.price | number: '1.2-2' }}
+              </div>
+              <div class="item-total">
+                <strong>Subtotal:</strong> ${{ (line.product.price * line.quantity) | number: '1.2-2' }}
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+

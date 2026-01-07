@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
+import { AuthService } from '../../services/auth.service';
 import { ProductDTO, CategoryDTO } from '../../models/api.models';
 
 interface CartItem {
@@ -21,6 +22,7 @@ interface CartItem {
 export class ProductsComponent implements OnInit {
   private productService = inject(ProductService);
   private categoryService = inject(CategoryService);
+  private authService = inject(AuthService);
 
   private products = signal<ProductDTO[]>([]);
   private categories = signal<CategoryDTO[]>([]);
@@ -49,6 +51,8 @@ export class ProductsComponent implements OnInit {
   cartItemCount = computed(() => {
     return this.cart().reduce((sum, item) => sum + item.quantity, 0);
   });
+
+  isAdmin = this.authService.isAdmin;
 
   ngOnInit(): void {
     this.loadCategories();

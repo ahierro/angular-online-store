@@ -57,13 +57,15 @@
               </div>
               <div class="product-footer">
                 <span class="product-price">${{ product.price | number: '1.2-2' }}</span>
-                <button
-                  (click)="addToCart(product)"
-                  [disabled]="product.stock === 0"
-                  class="btn-add-cart"
-                >
-                  {{ product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
-                </button>
+                @if (!isAdmin()) {
+                  <button
+                    (click)="addToCart(product)"
+                    [disabled]="product.stock === 0"
+                    class="btn-add-cart"
+                  >
+                    {{ product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
+                  </button>
+                }
               </div>
             </div>
           </div>
@@ -73,45 +75,47 @@
       }
     </div>
 
-    <div class="cart-sidebar">
-      <h2>Cart ({{ cartItemCount() }})</h2>
-      @if (cartItems().length === 0) {
-        <p class="empty-cart">Your cart is empty</p>
-      } @else {
-        <div class="cart-items">
-          @for (item of cartItems(); track item.product.productId) {
-            <div class="cart-item">
-              <div class="cart-item-info">
-                <h4>{{ item.product.productName }}</h4>
-                <p>${{ item.product.price | number: '1.2-2' }} each</p>
+    @if (!isAdmin()) {
+      <div class="cart-sidebar">
+        <h2>Cart ({{ cartItemCount() }})</h2>
+        @if (cartItems().length === 0) {
+          <p class="empty-cart">Your cart is empty</p>
+        } @else {
+          <div class="cart-items">
+            @for (item of cartItems(); track item.product.productId) {
+              <div class="cart-item">
+                <div class="cart-item-info">
+                  <h4>{{ item.product.productName }}</h4>
+                  <p>${{ item.product.price | number: '1.2-2' }} each</p>
+                </div>
+                <div class="cart-item-controls">
+                  <input
+                    type="number"
+                    [value]="item.quantity"
+                    (input)="updateQuantity(item.product.productId, +$any($event.target).value)"
+                    min="1"
+                    [max]="item.product.stock"
+                    class="quantity-input"
+                  />
+                  <button (click)="removeFromCart(item.product.productId)" class="btn-remove">
+                    Remove
+                  </button>
+                </div>
+                <div class="cart-item-total">
+                  ${{ (item.product.price * item.quantity) | number: '1.2-2' }}
+                </div>
               </div>
-              <div class="cart-item-controls">
-                <input
-                  type="number"
-                  [value]="item.quantity"
-                  (input)="updateQuantity(item.product.productId, +$any($event.target).value)"
-                  min="1"
-                  [max]="item.product.stock"
-                  class="quantity-input"
-                />
-                <button (click)="removeFromCart(item.product.productId)" class="btn-remove">
-                  Remove
-                </button>
-              </div>
-              <div class="cart-item-total">
-                ${{ (item.product.price * item.quantity) | number: '1.2-2' }}
-              </div>
-            </div>
-          }
-        </div>
-        <div class="cart-footer">
-          <div class="cart-total">
-            <strong>Total: ${{ cartTotal() | number: '1.2-2' }}</strong>
+            }
           </div>
-          <a routerLink="/checkout" class="btn-checkout">Checkout</a>
-        </div>
-      }
-    </div>
+          <div class="cart-footer">
+            <div class="cart-total">
+              <strong>Total: ${{ cartTotal() | number: '1.2-2' }}</strong>
+            </div>
+            <a routerLink="/checkout" class="btn-checkout">Checkout</a>
+          </div>
+        }
+      </div>
+    }
   </div>
 
   @if (total() > 1) {

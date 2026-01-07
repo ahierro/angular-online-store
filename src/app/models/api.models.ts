@@ -99,6 +99,10 @@ export interface PurchaseOrderDTO {
   };
 }
 
+export interface PurchaseOrderStatusUpdateDTO {
+  status: string;
+}
+
 export interface PageRequestDTO {
   page: number;
   size: number;

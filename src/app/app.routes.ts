@@ -54,6 +54,10 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/category-form/category-form.component').then(m => m.CategoryFormComponent)
       },
       {
+        path: 'purchase-orders',
+        loadComponent: () => import('./components/admin/purchase-orders/purchase-orders.component').then(m => m.AdminPurchaseOrdersComponent)
+      },
+      {
         path: '',
         redirectTo: '/admin/products',
         pathMatch: 'full'
