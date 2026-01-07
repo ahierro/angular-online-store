@@ -74,7 +74,8 @@ export class CheckoutComponent implements OnInit {
     this.errorMessage.set(null);
     this.successMessage.set(null);
 
-    const orderId = `ORDER-${Date.now()}`;
+    // Generate a unique purchase order ID on the client side
+    const orderId = crypto.randomUUID();
     const lines: PurchaseOrderLineCreationDTO[] = this.cart().map((item) => ({
       idProduct: item.product.productId,
       quantity: item.quantity
