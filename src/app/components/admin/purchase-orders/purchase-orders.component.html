@@ -42,7 +42,7 @@
                     }
                   </td>
                   <td>
-                    <button (click)="openOrderDetails(order)" class="btn btn-sm btn-primary">View Items</button>
+                    <a [routerLink]="['/admin/purchase-orders', order.id]" class="btn btn-sm btn-primary">View Items</a>
                   </td>
                 </tr>
               } @empty {
@@ -86,115 +86,4 @@
   }
 </div>
 
-@if (modalVisible()) {
-  <div class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);" (click)="closeModal()">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable" (click)="$event.stopPropagation()">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title h5">
-            @if (selected()) {
-              Order Details - {{ selected()!.id }}
-            } @else {
-              Order Details
-            }
-          </h2>
-          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          @if (loadingOrderDetails()) {
-            <div class="text-center py-5">
-              <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              <p class="mt-2">Loading order details...</p>
-            </div>
-          } @else if (selected(); as order) {
-            <div class="mb-4">
-              <h3 class="h5">Customer Information</h3>
-              @if (order.user) {
-                <dl class="row">
-                  <dt class="col-sm-3">Username:</dt>
-                  <dd class="col-sm-9">{{ order.user.username }}</dd>
-                  <dt class="col-sm-3">Name:</dt>
-                  <dd class="col-sm-9">{{ order.user.firstName }} {{ order.user.lastName }}</dd>
-                  <dt class="col-sm-3">Email:</dt>
-                  <dd class="col-sm-9">{{ order.user.email }}</dd>
-                </dl>
-              } @else {
-                <p class="text-muted">N/A</p>
-              }
-            </div>
-            <div class="mb-4">
-              <h3 class="h5">Order Information</h3>
-              <dl class="row">
-                <dt class="col-sm-3">Status:</dt>
-                <dd class="col-sm-9">
-                  <select
-                    [value]="status()"
-                    (change)="onStatusChange($any($event.target).value)"
-                    [disabled]="updatingStatus()"
-                    class="form-select"
-                  >
-                    <option value="PENDING">PENDING</option>
-                    <option value="APPROVED">APPROVED</option>
-                    <option value="REJECTED">REJECTED</option>
-                    <option value="DELIVERED">DELIVERED</option>
-                    <option value="CANCELLED">CANCELLED</option>
-                  </select>
-                </dd>
-                <dt class="col-sm-3">Total:</dt>
-                <dd class="col-sm-9">${{ order.total | number: '1.2-2' }}</dd>
-                @if (order.createdAt) {
-                  <dt class="col-sm-3">Created:</dt>
-                  <dd class="col-sm-9">{{ order.createdAt | date: 'short' }}</dd>
-                }
-              </dl>
-            </div>
-            <div class="mb-4">
-              <h3 class="h5">Order Items</h3>
-              <div class="list-group">
-                @for (line of order.lines; track line.product.productId) {
-                  <div class="list-group-item">
-                    <div class="row align-items-center">
-                      <div class="col-auto">
-                        <img [src]="line.product.smallImageUrl" [alt]="line.product.productName" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" />
-                      </div>
-                      <div class="col">
-                        <h6 class="mb-1">{{ line.product.productName }}</h6>
-                        <p class="mb-1 small text-muted">{{ line.product.productDescription }}</p>
-                        <span class="badge bg-secondary me-2">{{ line.product.category.name }}</span>
-                        <small class="text-muted">ID: {{ line.product.productId }}</small>
-                      </div>
-                      <div class="col-auto text-end">
-                        <div><strong>Qty:</strong> {{ line.quantity }}</div>
-                        <div><strong>Price:</strong> ${{ line.product.price | number: '1.2-2' }}</div>
-                        <div class="fw-bold text-primary">Subtotal: ${{ (line.product.price * line.quantity) | number: '1.2-2' }}</div>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-        </div>
-        @if (selected(); as order) {
-          <div class="modal-footer">
-            <button
-              (click)="confirmStatusUpdate()"
-              [disabled]="updatingStatus() || status() === order.status"
-              class="btn btn-primary"
-            >
-              @if (updatingStatus()) {
-                Updating...
-              } @else {
-                Confirm
-              }
-            </button>
-            <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
-          </div>
-        }
-      </div>
-    </div>
-  </div>
-}
 

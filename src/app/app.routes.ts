@@ -58,6 +58,10 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/purchase-orders/purchase-orders.component').then(m => m.AdminPurchaseOrdersComponent)
       },
       {
+        path: 'purchase-orders/:id',
+        loadComponent: () => import('./components/admin/purchase-order-details/purchase-order-details.component').then(m => m.PurchaseOrderDetailsComponent)
+      },
+      {
         path: '',
         redirectTo: '/admin/products',
         pathMatch: 'full'

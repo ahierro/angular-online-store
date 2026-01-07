@@ -1,0 +1,126 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Purchase Order Details</h1>
+    <a routerLink="/admin/purchase-orders" class="btn btn-secondary">Back to Orders</a>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading order details...</p>
+    </div>
+  } @else if (orderData(); as order) {
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Order Information</h2>
+          </div>
+          <div class="card-body">
+            <dl class="row">
+              <dt class="col-sm-3">Order ID:</dt>
+              <dd class="col-sm-9">{{ order.id }}</dd>
+              <dt class="col-sm-3">Status:</dt>
+              <dd class="col-sm-9">
+                <select
+                  [value]="status()"
+                  (change)="onStatusChange($any($event.target).value)"
+                  [disabled]="updatingStatus()"
+                  class="form-select"
+                >
+                  <option value="PENDING">PENDING</option>
+                  <option value="APPROVED">APPROVED</option>
+                  <option value="REJECTED">REJECTED</option>
+                  <option value="DELIVERED">DELIVERED</option>
+                  <option value="CANCELLED">CANCELLED</option>
+                </select>
+              </dd>
+              <dt class="col-sm-3">Total:</dt>
+              <dd class="col-sm-9">
+                <strong class="text-primary">${{ order.total | number: '1.2-2' }}</strong>
+              </dd>
+              @if (order.createdAt) {
+                <dt class="col-sm-3">Created:</dt>
+                <dd class="col-sm-9">{{ order.createdAt | date: 'short' }}</dd>
+              }
+            </dl>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Customer Information</h2>
+          </div>
+          <div class="card-body">
+            @if (order.user) {
+              <dl class="row">
+                <dt class="col-sm-3">Username:</dt>
+                <dd class="col-sm-9">{{ order.user.username }}</dd>
+                <dt class="col-sm-3">Name:</dt>
+                <dd class="col-sm-9">{{ order.user.firstName }} {{ order.user.lastName }}</dd>
+                <dt class="col-sm-3">Email:</dt>
+                <dd class="col-sm-9">{{ order.user.email }}</dd>
+              </dl>
+            } @else {
+              <p class="text-muted">Customer information not available</p>
+            }
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="h5 mb-0">Order Items</h2>
+          </div>
+          <div class="card-body">
+            <div class="list-group">
+              @for (line of order.lines; track line.product.productId) {
+                <div class="list-group-item">
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <img [src]="line.product.smallImageUrl" [alt]="line.product.productName" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" />
+                    </div>
+                    <div class="col">
+                      <h6 class="mb-1">{{ line.product.productName }}</h6>
+                      <p class="mb-1 small text-muted">{{ line.product.productDescription }}</p>
+                      <span class="badge bg-secondary me-2">{{ line.product.category.name }}</span>
+                      <small class="text-muted">ID: {{ line.product.productId }}</small>
+                    </div>
+                    <div class="col-auto text-end">
+                      <div><strong>Qty:</strong> {{ line.quantity }}</div>
+                      <div><strong>Price:</strong> ${{ line.product.price | number: '1.2-2' }}</div>
+                      <div class="fw-bold text-primary">Subtotal: ${{ (line.product.price * line.quantity) | number: '1.2-2' }}</div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="h6 mb-0">Actions</h3>
+          </div>
+          <div class="card-body">
+            <button
+              (click)="confirmStatusUpdate()"
+              [disabled]="updatingStatus() || status() === order.status"
+              class="btn btn-primary w-100"
+            >
+              @if (updatingStatus()) {
+                Updating...
+              } @else {
+                Update Status
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
