@@ -1,0 +1,10 @@
+.alert-container {
+  pointer-events: none;
+}
+
+.alert-container .alert {
+  pointer-events: auto;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+

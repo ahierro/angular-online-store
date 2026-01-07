@@ -1,0 +1,18 @@
+<div class="alert-container position-fixed top-0 end-0 p-3" style="z-index: 1050; max-width: 400px;">
+  @for (alert of alerts(); track alert.id) {
+    <div [class]="getAlertClass(alert.type)" role="alert">
+      <div class="d-flex align-items-center">
+        <div class="flex-grow-1">
+          {{ alert.message }}
+        </div>
+        <button
+          type="button"
+          class="btn-close ms-2"
+          aria-label="Close"
+          (click)="removeAlert(alert.id)"
+        ></button>
+      </div>
+    </div>
+  }
+</div>
+
