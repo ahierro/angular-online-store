@@ -85,6 +85,18 @@ export interface PurchaseOrderLineDTO {
   product: ProductDTO;
 }
 
+export interface PurchaseOrderListItemDTO {
+  id: string;
+  idUser: string;
+  total: number;
+  status: string;
+  createdAt?: string;
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface PurchaseOrderDTO {
   id: string;
   lines: PurchaseOrderLineDTO[];
@@ -123,7 +135,7 @@ export interface PageResponse<T> {
 
 export interface ProductPage extends PageResponse<ProductDTO> {}
 export interface CategoryPage extends PageResponse<CategoryDTO> {}
-export interface PurchaseOrderPage extends PageResponse<PurchaseOrderDTO> {}
+export interface PurchaseOrderPage extends PageResponse<PurchaseOrderListItemDTO> {}
 
 export interface UserInfo {
   username: string;

@@ -199,6 +199,7 @@ th {
 .info-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.75rem;
 }
 
@@ -207,9 +208,53 @@ th {
   min-width: 120px;
 }
 
+.info-row .status-select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background-color: white;
+  min-width: 150px;
+}
+
+.info-row .status-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .modal-body h3 {
   margin: 0 0 1rem 0;
   color: #333;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 2px solid #eee;
+}
+
+.btn-confirm {
+  padding: 0.75rem 2rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-confirm:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.btn-confirm:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .items-list {

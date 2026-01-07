@@ -36,5 +36,9 @@ export class PurchaseOrderService {
   updatePurchaseOrderStatus(id: string, statusUpdate: PurchaseOrderStatusUpdateDTO): Observable<void> {
     return this.http.patch<void>(`${this.API_URL}/${id}/status`, statusUpdate);
   }
+
+  updatePurchaseOrder(id: string, statusUpdate: PurchaseOrderStatusUpdateDTO): Observable<void> {
+    return this.http.patch<void>(`${this.API_URL}/${id}`, statusUpdate);
+  }
 }
 

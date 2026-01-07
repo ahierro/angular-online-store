@@ -22,28 +22,9 @@
           @for (order of ordersList(); track order.id) {
             <tr>
               <td>{{ order.id }}</td>
-              <td>
-                @if (order.user) {
-                  {{ order.user.firstName }} {{ order.user.lastName }}
-                } @else {
-                  N/A
-                }
-              </td>
+              <td>{{ order.username }}</td>
               <td>${{ order.total | number: '1.2-2' }}</td>
-              <td>
-                <select
-                  [value]="order.status"
-                  (change)="updateStatus(order.id, $any($event.target).value)"
-                  [disabled]="updatingStatus()"
-                  class="status-select"
-                >
-                  <option value="PENDING">PENDING</option>
-                  <option value="PROCESSING">PROCESSING</option>
-                  <option value="SHIPPED">SHIPPED</option>
-                  <option value="DELIVERED">DELIVERED</option>
-                  <option value="CANCELLED">CANCELLED</option>
-                </select>
-              </td>
+              <td>{{ order.status }}</td>
               <td>
                 @if (order.createdAt) {
                   {{ order.createdAt | date: 'short' }}
@@ -131,7 +112,18 @@
           <h3>Order Information</h3>
           <div class="info-row">
             <strong>Status:</strong>
-            <span>{{ order.status }}</span>
+            <select
+              [value]="status()"
+              (change)="onStatusChange($any($event.target).value)"
+              [disabled]="updatingStatus()"
+              class="status-select"
+            >
+              <option value="PENDING">PENDING</option>
+              <option value="APPROVED">APPROVED</option>
+              <option value="REJECTED">REJECTED</option>
+              <option value="DELIVERED">DELIVERED</option>
+              <option value="CANCELLED">CANCELLED</option>
+            </select>
           </div>
           <div class="info-row">
             <strong>Total:</strong>
@@ -170,6 +162,19 @@
               </div>
             </div>
           }
+        </div>
+        <div class="modal-footer">
+          <button
+            (click)="confirmStatusUpdate()"
+            [disabled]="updatingStatus() || status() === order.status"
+            class="btn-confirm"
+          >
+            @if (updatingStatus()) {
+              Updating...
+            } @else {
+              Confirm
+            }
+          </button>
         </div>
         }
       </div>

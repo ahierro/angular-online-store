@@ -1,7 +1,7 @@
 import { Component, signal, ChangeDetectionStrategy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PurchaseOrderService } from '../../../services/purchase-order.service';
-import { PurchaseOrderDTO } from '../../../models/api.models';
+import { PurchaseOrderDTO, PurchaseOrderListItemDTO } from '../../../models/api.models';
 
 @Component({
   selector: 'app-admin-purchase-orders',
@@ -13,7 +13,7 @@ import { PurchaseOrderDTO } from '../../../models/api.models';
 export class AdminPurchaseOrdersComponent implements OnInit {
   private purchaseOrderService = inject(PurchaseOrderService);
 
-  private purchaseOrders = signal<PurchaseOrderDTO[]>([]);
+  private purchaseOrders = signal<PurchaseOrderListItemDTO[]>([]);
   private currentPage = signal(0);
   private totalPages = signal(0);
   private isLoading = signal(false);
@@ -21,6 +21,7 @@ export class AdminPurchaseOrdersComponent implements OnInit {
   private showModal = signal(false);
   private isUpdatingStatus = signal(false);
   private isLoadingOrderDetails = signal(false);
+  private selectedStatus = signal<string>('');
 
   ordersList = this.purchaseOrders.asReadonly();
   page = this.currentPage.asReadonly();
@@ -30,6 +31,7 @@ export class AdminPurchaseOrdersComponent implements OnInit {
   modalVisible = this.showModal.asReadonly();
   updatingStatus = this.isUpdatingStatus.asReadonly();
   loadingOrderDetails = this.isLoadingOrderDetails.asReadonly();
+  status = this.selectedStatus.asReadonly();
 
   ngOnInit(): void {
     this.loadPurchaseOrders();
@@ -55,14 +57,16 @@ export class AdminPurchaseOrdersComponent implements OnInit {
       });
   }
 
-  openOrderDetails(order: PurchaseOrderDTO): void {
+  openOrderDetails(order: PurchaseOrderListItemDTO): void {
     this.isLoadingOrderDetails.set(true);
     this.showModal.set(true);
     this.selectedOrder.set(null);
+    this.selectedStatus.set('');
 
     this.purchaseOrderService.getPurchaseOrder(order.id).subscribe({
       next: (orderDetails) => {
         this.selectedOrder.set(orderDetails);
+        this.selectedStatus.set(orderDetails.status);
         this.isLoadingOrderDetails.set(false);
       },
       error: () => {
@@ -75,25 +79,33 @@ export class AdminPurchaseOrdersComponent implements OnInit {
   closeModal(): void {
     this.showModal.set(false);
     this.selectedOrder.set(null);
+    this.selectedStatus.set('');
   }
 
-  updateStatus(orderId: string, newStatus: string): void {
+  onStatusChange(newStatus: string): void {
+    this.selectedStatus.set(newStatus);
+  }
+
+  confirmStatusUpdate(): void {
+    const order = this.selectedOrder();
+    if (!order) {
+      return;
+    }
+
     this.isUpdatingStatus.set(true);
     this.purchaseOrderService
-      .updatePurchaseOrderStatus(orderId, { status: newStatus })
+      .updatePurchaseOrder(order.id, { status: this.selectedStatus() })
       .subscribe({
         next: () => {
           this.isUpdatingStatus.set(false);
           this.loadPurchaseOrders();
-          // Refresh selected order if it's the one being updated
-          const currentSelected = this.selectedOrder();
-          if (currentSelected && currentSelected.id === orderId) {
-            this.purchaseOrderService.getPurchaseOrder(orderId).subscribe({
-              next: (updatedOrder) => {
-                this.selectedOrder.set(updatedOrder);
-              }
-            });
-          }
+          // Refresh selected order to show updated status
+          this.purchaseOrderService.getPurchaseOrder(order.id).subscribe({
+            next: (updatedOrder) => {
+              this.selectedOrder.set(updatedOrder);
+              this.selectedStatus.set(updatedOrder.status);
+            }
+          });
         },
         error: () => {
           this.isUpdatingStatus.set(false);
