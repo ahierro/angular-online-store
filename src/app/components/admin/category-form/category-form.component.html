@@ -1,94 +1,105 @@
-<div class="form-container">
-  <h1>{{ editMode() ? 'Edit Category' : 'Create Category' }}</h1>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="card-title mb-4">{{ editMode() ? 'Edit Category' : 'Create Category' }}</h1>
 
-  @if (error()) {
-    <div class="error-message" role="alert">
-      {{ error() }}
-    </div>
-  }
-
-  <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label for="id">Category ID</label>
-      <div class="input-with-button">
-        <input
-          id="id"
-          type="text"
-          formControlName="id"
-          [disabled]="editMode()"
-          [class.error]="categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched"
-          required
-        />
-        @if (!editMode()) {
-          <button
-            type="button"
-            (click)="generateUUID()"
-            class="btn-generate-uuid"
-            title="Generate new UUID"
-          >
-            Generate UUID
-          </button>
-        }
-      </div>
-      @if (categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched) {
-        <span class="field-error">
-          @if (categoryForm.get('id')?.hasError('required')) {
-            Category ID is required
-          } @else if (categoryForm.get('id')?.hasError('invalidUuid')) {
-            Category ID must be a valid UUID v4
+          @if (error()) {
+            <div class="alert alert-danger" role="alert">
+              {{ error() }}
+            </div>
           }
-        </span>
-      }
-    </div>
 
-    <div class="form-group">
-      <label for="name">Category Name</label>
-      <input
-        id="name"
-        type="text"
-        formControlName="name"
-        [class.error]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
-        required
-      />
-      @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
-        <span class="field-error">Category name is required</span>
-      }
-    </div>
+          <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="id" class="form-label">Category ID</label>
+              <div class="input-group">
+                <input
+                  id="id"
+                  type="text"
+                  formControlName="id"
+                  [disabled]="editMode()"
+                  [class.is-invalid]="categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched"
+                  class="form-control"
+                  required
+                />
+                @if (!editMode()) {
+                  <button
+                    type="button"
+                    (click)="generateUUID()"
+                    class="btn btn-outline-secondary"
+                    title="Generate new UUID"
+                  >
+                    Generate UUID
+                  </button>
+                }
+              </div>
+              @if (categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched) {
+                <div class="invalid-feedback d-block">
+                  @if (categoryForm.get('id')?.hasError('required')) {
+                    Category ID is required
+                  } @else if (categoryForm.get('id')?.hasError('invalidUuid')) {
+                    Category ID must be a valid UUID v4
+                  }
+                </div>
+              }
+            </div>
 
-    <div class="form-group">
-      <label for="description">Description</label>
-      <textarea
-        id="description"
-        formControlName="description"
-        rows="4"
-        [class.error]="categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched"
-        required
-      ></textarea>
-      @if (categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched) {
-        <span class="field-error">Description is required</span>
-      }
-    </div>
+            <div class="mb-3">
+              <label for="name" class="form-label">Category Name</label>
+              <input
+                id="name"
+                type="text"
+                formControlName="name"
+                [class.is-invalid]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+                class="form-control"
+                required
+              />
+              @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+                <div class="invalid-feedback">Category name is required</div>
+              }
+            </div>
 
-    <div class="form-actions">
-      <button
-        type="submit"
-        [disabled]="categoryForm.invalid || loading()"
-        class="btn-submit"
-      >
-        @if (loading()) {
-          <span>{{ editMode() ? 'Updating...' : 'Creating...' }}</span>
-        } @else {
-          <span>{{ editMode() ? 'Update Category' : 'Create Category' }}</span>
-        }
-      </button>
-      <button
-        type="button"
-        (click)="router.navigate(['/admin/categories'])"
-        class="btn-cancel"
-      >
-        Cancel
-      </button>
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea
+                id="description"
+                formControlName="description"
+                rows="4"
+                [class.is-invalid]="categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched"
+                class="form-control"
+                required
+              ></textarea>
+              @if (categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched) {
+                <div class="invalid-feedback">Description is required</div>
+              }
+            </div>
+
+            <div class="d-flex gap-2">
+              <button
+                type="submit"
+                [disabled]="categoryForm.invalid || loading()"
+                class="btn btn-primary"
+              >
+                @if (loading()) {
+                  <span>{{ editMode() ? 'Updating...' : 'Creating...' }}</span>
+                } @else {
+                  <span>{{ editMode() ? 'Update Category' : 'Create Category' }}</span>
+                }
+              </button>
+              <button
+                type="button"
+                (click)="router.navigate(['/admin/categories'])"
+                class="btn btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-  </form>
+  </div>
 </div>
 

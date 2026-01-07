@@ -1,27 +1,52 @@
 <app-alert />
 
-<nav class="navbar">
-  <div class="nav-container">
-    <a routerLink="/products" class="nav-logo">Online Store</a>
-    <div class="nav-links">
-      @if (isAuthenticated()) {
-        @if (isAdmin()) {
-          <a routerLink="/admin/products" routerLinkActive="active">Products</a>
-          <a routerLink="/admin/categories" routerLinkActive="active">Categories</a>
-          <a routerLink="/admin/purchase-orders" routerLinkActive="active">Purchase Orders</a>
-        } @else {
-          <a routerLink="/products" routerLinkActive="active">Products</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a routerLink="/products" class="navbar-brand">Online Store</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        @if (isAuthenticated()) {
+          @if (isAdmin()) {
+            <li class="nav-item">
+              <a routerLink="/admin/products" routerLinkActive="active" class="nav-link">Products</a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/admin/categories" routerLinkActive="active" class="nav-link">Categories</a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/admin/purchase-orders" routerLinkActive="active" class="nav-link">Purchase Orders</a>
+            </li>
+          } @else {
+            <li class="nav-item">
+              <a routerLink="/products" routerLinkActive="active" class="nav-link">Products</a>
+            </li>
+          }
         }
-        <span class="user-info">Welcome, {{ user()?.firstName }} {{ user()?.lastName }}</span>
-        <button (click)="logout()" class="btn-logout">Logout</button>
-      } @else {
-        <a routerLink="/login" routerLinkActive="active">Login</a>
-        <a routerLink="/signup" routerLinkActive="active">Sign Up</a>
-      }
+      </ul>
+      <ul class="navbar-nav">
+        @if (isAuthenticated()) {
+          <li class="nav-item">
+            <span class="navbar-text me-3">Welcome, {{ user()?.firstName }} {{ user()?.lastName }}</span>
+          </li>
+          <li class="nav-item">
+            <button (click)="logout()" class="btn btn-outline-light">Logout</button>
+          </li>
+        } @else {
+          <li class="nav-item">
+            <a routerLink="/login" routerLinkActive="active" class="nav-link">Login</a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/signup" routerLinkActive="active" class="nav-link">Sign Up</a>
+          </li>
+        }
+      </ul>
     </div>
   </div>
 </nav>
 
-<main class="main-content">
+<main class="container-fluid mt-4">
   <router-outlet />
 </main>

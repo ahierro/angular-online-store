@@ -1,64 +1,81 @@
-<div class="admin-container">
-  <div class="header">
+<div class="container-fluid mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Products Management</h1>
-    <a routerLink="/admin/products/new" class="btn-primary">Add New Product</a>
+    <a routerLink="/admin/products/new" class="btn btn-primary">Add New Product</a>
   </div>
 
   @if (loading()) {
-    <div class="loading">Loading products...</div>
+    <div class="text-center py-5">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading products...</p>
+    </div>
   } @else {
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Stock</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (product of productsList(); track product.productId) {
-            <tr>
-              <td>{{ product.productId }}</td>
-              <td>{{ product.productName }}</td>
-              <td>{{ product.category.name }}</td>
-              <td>${{ product.price | number: '1.2-2' }}</td>
-              <td>{{ product.stock }}</td>
-              <td class="actions">
-                <a [routerLink]="['/admin/products', product.productId, 'edit']" class="btn-edit">Edit</a>
-                <button (click)="deleteProduct(product.productId)" class="btn-delete">Delete</button>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="6" class="empty">No products found</td>
-            </tr>
-          }
-        </tbody>
-      </table>
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of productsList(); track product.productId) {
+                <tr>
+                  <td>{{ product.productId }}</td>
+                  <td>{{ product.productName }}</td>
+                  <td>{{ product.category.name }}</td>
+                  <td>${{ product.price | number: '1.2-2' }}</td>
+                  <td>{{ product.stock }}</td>
+                  <td>
+                    <a [routerLink]="['/admin/products', product.productId, 'edit']" class="btn btn-sm btn-outline-primary me-2">Edit</a>
+                    <button (click)="deleteProduct(product.productId)" class="btn btn-sm btn-danger">Delete</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">No products found</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     @if (total() > 1) {
-      <div class="pagination">
-        <button
-          (click)="goToPage(page() - 1)"
-          [disabled]="page() === 0"
-          class="btn-page"
-        >
-          Previous
-        </button>
-        <span>Page {{ page() + 1 }} of {{ total() }}</span>
-        <button
-          (click)="goToPage(page() + 1)"
-          [disabled]="page() >= total() - 1"
-          class="btn-page"
-        >
-          Next
-        </button>
-      </div>
+      <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="page() === 0">
+            <button
+              class="page-link"
+              (click)="goToPage(page() - 1)"
+              [disabled]="page() === 0"
+            >
+              Previous
+            </button>
+          </li>
+          <li class="page-item">
+            <span class="page-link">Page {{ page() + 1 }} of {{ total() }}</span>
+          </li>
+          <li class="page-item" [class.disabled]="page() >= total() - 1">
+            <button
+              class="page-link"
+              (click)="goToPage(page() + 1)"
+              [disabled]="page() >= total() - 1"
+            >
+              Next
+            </button>
+          </li>
+        </ul>
+      </nav>
     }
   }
 </div>
