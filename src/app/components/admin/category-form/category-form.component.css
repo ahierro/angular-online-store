@@ -60,6 +60,33 @@ input:disabled {
   cursor: not-allowed;
 }
 
+.input-with-button {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+.btn-generate-uuid {
+  padding: 0.75rem 1rem;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.btn-generate-uuid:hover {
+  background-color: #5a6268;
+}
+
 textarea {
   resize: vertical;
 }

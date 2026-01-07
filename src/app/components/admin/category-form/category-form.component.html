@@ -10,16 +10,34 @@
   <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="id">Category ID</label>
-      <input
-        id="id"
-        type="text"
-        formControlName="id"
-        [disabled]="editMode()"
-        [class.error]="categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched"
-        required
-      />
+      <div class="input-with-button">
+        <input
+          id="id"
+          type="text"
+          formControlName="id"
+          [disabled]="editMode()"
+          [class.error]="categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched"
+          required
+        />
+        @if (!editMode()) {
+          <button
+            type="button"
+            (click)="generateUUID()"
+            class="btn-generate-uuid"
+            title="Generate new UUID"
+          >
+            Generate UUID
+          </button>
+        }
+      </div>
       @if (categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched) {
-        <span class="field-error">Category ID is required</span>
+        <span class="field-error">
+          @if (categoryForm.get('id')?.hasError('required')) {
+            Category ID is required
+          } @else if (categoryForm.get('id')?.hasError('invalidUuid')) {
+            Category ID must be a valid UUID v4
+          }
+        </span>
       }
     </div>
 

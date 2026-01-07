@@ -10,16 +10,34 @@
   <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
       <label for="productId">Product ID</label>
-      <input
-        id="productId"
-        type="text"
-        formControlName="productId"
-        [disabled]="editMode()"
-        [class.error]="productForm.get('productId')?.invalid && productForm.get('productId')?.touched"
-        required
-      />
+      <div class="input-with-button">
+        <input
+          id="productId"
+          type="text"
+          formControlName="productId"
+          [disabled]="editMode()"
+          [class.error]="productForm.get('productId')?.invalid && productForm.get('productId')?.touched"
+          required
+        />
+        @if (!editMode()) {
+          <button
+            type="button"
+            (click)="generateUUID()"
+            class="btn-generate-uuid"
+            title="Generate new UUID"
+          >
+            Generate UUID
+          </button>
+        }
+      </div>
       @if (productForm.get('productId')?.invalid && productForm.get('productId')?.touched) {
-        <span class="field-error">Product ID is required</span>
+        <span class="field-error">
+          @if (productForm.get('productId')?.hasError('required')) {
+            Product ID is required
+          } @else if (productForm.get('productId')?.hasError('invalidUuid')) {
+            Product ID must be a valid UUID v4
+          }
+        </span>
       }
     </div>
 

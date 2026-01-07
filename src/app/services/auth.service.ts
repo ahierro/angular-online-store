@@ -25,11 +25,13 @@ export class AuthService {
     private router: Router
   ) {}
 
-  login(credentials: LoginRequest): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.API_URL}/login`, credentials).pipe(
-      tap((response) => {
-        this.setToken(response.token);
-        this.decodeAndStoreUser(response.token);
+  login(credentials: LoginRequest): Observable<string> {
+    return this.http.post<string>(`${this.API_URL}/login`, credentials, {
+      responseType: 'text' as 'json'
+    }).pipe(
+      tap((token) => {
+        this.setToken(token);
+        this.decodeAndStoreUser(token);
       }),
       catchError((error) => {
         return throwError(() => error);
@@ -70,12 +72,15 @@ export class AuthService {
   private decodeAndStoreUser(token: string): void {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
+      const scope = payload.scope || '';
+      const isAdmin = scope.includes('ROLE_ADMIN');
+      
       const userInfo: UserInfo = {
-        username: payload.sub || payload.username,
+        username: payload.name || '',
         email: payload.email || '',
         firstName: payload.firstName || '',
         lastName: payload.lastName || '',
-        isAdmin: payload.isAdmin || payload.roles?.includes('ADMIN') || false
+        isAdmin: isAdmin
       };
       this.userSignal.set(userInfo);
       localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
