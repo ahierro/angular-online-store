@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { CategoryService } from '../../../services/category.service';
 import { CategoryCreationDTO, CategoryUpdateDTO } from '../../../models/api.models';
+import { handleFormValidationErrors } from '../../../utils/form-error.util';
 
 @Component({
   selector: 'app-category-form',
@@ -39,6 +40,19 @@ export class CategoryFormComponent implements OnInit {
     }
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(control.value) ? null : { invalidUuid: true };
+  }
+
+  getServerError(controlName: string): string | null {
+    const control = this.categoryForm.get(controlName);
+    if (control && control.hasError('serverError')) {
+      return control.getError('serverError');
+    }
+    return null;
+  }
+
+  hasServerError(controlName: string): boolean {
+    const control = this.categoryForm.get(controlName);
+    return control ? control.hasError('serverError') : false;
   }
 
   ngOnInit(): void {
@@ -105,9 +119,13 @@ export class CategoryFormComponent implements OnInit {
         next: () => {
           this.router.navigate(['/admin/categories']);
         },
-        error: () => {
+        error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage.set('Failed to update category');
+          // Try to handle validation errors first
+          if (!handleFormValidationErrors(error, this.categoryForm)) {
+            // If no validation errors were handled, show generic error
+            this.errorMessage.set('Failed to update category');
+          }
         }
       });
     } else {
@@ -121,9 +139,13 @@ export class CategoryFormComponent implements OnInit {
         next: () => {
           this.router.navigate(['/admin/categories']);
         },
-        error: () => {
+        error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage.set('Failed to create category');
+          // Try to handle validation errors first
+          if (!handleFormValidationErrors(error, this.categoryForm)) {
+            // If no validation errors were handled, show generic error
+            this.errorMessage.set('Failed to create category');
+          }
         }
       });
     }

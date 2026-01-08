@@ -20,7 +20,7 @@
                   type="text"
                   formControlName="productId"
                   [disabled]="editMode()"
-                  [class.is-invalid]="productForm.get('productId')?.invalid && productForm.get('productId')?.touched"
+                  [class.is-invalid]="(productForm.get('productId')?.invalid && productForm.get('productId')?.touched) || hasServerError('productId')"
                   class="form-control"
                   required
                 />
@@ -35,9 +35,11 @@
                   </button>
                 }
               </div>
-              @if (productForm.get('productId')?.invalid && productForm.get('productId')?.touched) {
+              @if ((productForm.get('productId')?.invalid && productForm.get('productId')?.touched) || hasServerError('productId')) {
                 <div class="invalid-feedback d-block">
-                  @if (productForm.get('productId')?.hasError('required')) {
+                  @if (hasServerError('productId')) {
+                    {{ getServerError('productId') }}
+                  } @else if (productForm.get('productId')?.hasError('required')) {
                     Product ID is required
                   } @else if (productForm.get('productId')?.hasError('invalidUuid')) {
                     Product ID must be a valid UUID v4
@@ -52,12 +54,18 @@
                 id="productName"
                 type="text"
                 formControlName="productName"
-                [class.is-invalid]="productForm.get('productName')?.invalid && productForm.get('productName')?.touched"
+                [class.is-invalid]="(productForm.get('productName')?.invalid && productForm.get('productName')?.touched) || hasServerError('productName')"
                 class="form-control"
                 required
               />
-              @if (productForm.get('productName')?.invalid && productForm.get('productName')?.touched) {
-                <div class="invalid-feedback">Product name is required</div>
+              @if ((productForm.get('productName')?.invalid && productForm.get('productName')?.touched) || hasServerError('productName')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('productName')) {
+                    {{ getServerError('productName') }}
+                  } @else {
+                    Product name is required
+                  }
+                </div>
               }
             </div>
 
@@ -67,12 +75,18 @@
                 id="productDescription"
                 formControlName="productDescription"
                 rows="4"
-                [class.is-invalid]="productForm.get('productDescription')?.invalid && productForm.get('productDescription')?.touched"
+                [class.is-invalid]="(productForm.get('productDescription')?.invalid && productForm.get('productDescription')?.touched) || hasServerError('productDescription')"
                 class="form-control"
                 required
               ></textarea>
-              @if (productForm.get('productDescription')?.invalid && productForm.get('productDescription')?.touched) {
-                <div class="invalid-feedback">Description is required</div>
+              @if ((productForm.get('productDescription')?.invalid && productForm.get('productDescription')?.touched) || hasServerError('productDescription')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('productDescription')) {
+                    {{ getServerError('productDescription') }}
+                  } @else {
+                    Description is required
+                  }
+                </div>
               }
             </div>
 
@@ -84,12 +98,18 @@
                   type="number"
                   step="0.01"
                   formControlName="price"
-                  [class.is-invalid]="productForm.get('price')?.invalid && productForm.get('price')?.touched"
+                  [class.is-invalid]="(productForm.get('price')?.invalid && productForm.get('price')?.touched) || hasServerError('price')"
                   class="form-control"
                   required
                 />
-                @if (productForm.get('price')?.invalid && productForm.get('price')?.touched) {
-                  <div class="invalid-feedback">Valid price is required</div>
+                @if ((productForm.get('price')?.invalid && productForm.get('price')?.touched) || hasServerError('price')) {
+                  <div class="invalid-feedback">
+                    @if (hasServerError('price')) {
+                      {{ getServerError('price') }}
+                    } @else {
+                      Valid price is required
+                    }
+                  </div>
                 }
               </div>
 
@@ -99,12 +119,18 @@
                   id="stock"
                   type="number"
                   formControlName="stock"
-                  [class.is-invalid]="productForm.get('stock')?.invalid && productForm.get('stock')?.touched"
+                  [class.is-invalid]="(productForm.get('stock')?.invalid && productForm.get('stock')?.touched) || hasServerError('stock')"
                   class="form-control"
                   required
                 />
-                @if (productForm.get('stock')?.invalid && productForm.get('stock')?.touched) {
-                  <div class="invalid-feedback">Valid stock is required</div>
+                @if ((productForm.get('stock')?.invalid && productForm.get('stock')?.touched) || hasServerError('stock')) {
+                  <div class="invalid-feedback">
+                    @if (hasServerError('stock')) {
+                      {{ getServerError('stock') }}
+                    } @else {
+                      Valid stock is required
+                    }
+                  </div>
                 }
               </div>
             </div>
@@ -114,7 +140,7 @@
               <select
                 id="categoryId"
                 formControlName="categoryId"
-                [class.is-invalid]="productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched"
+                [class.is-invalid]="(productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched) || hasServerError('categoryId')"
                 class="form-select"
                 required
               >
@@ -123,8 +149,14 @@
                   <option [value]="category.id">{{ category.name }}</option>
                 }
               </select>
-              @if (productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched) {
-                <div class="invalid-feedback">Category is required</div>
+              @if ((productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched) || hasServerError('categoryId')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('categoryId')) {
+                    {{ getServerError('categoryId') }}
+                  } @else {
+                    Category is required
+                  }
+                </div>
               }
             </div>
 
@@ -134,12 +166,18 @@
                 id="smallImageUrl"
                 type="url"
                 formControlName="smallImageUrl"
-                [class.is-invalid]="productForm.get('smallImageUrl')?.invalid && productForm.get('smallImageUrl')?.touched"
+                [class.is-invalid]="(productForm.get('smallImageUrl')?.invalid && productForm.get('smallImageUrl')?.touched) || hasServerError('smallImageUrl')"
                 class="form-control"
                 required
               />
-              @if (productForm.get('smallImageUrl')?.invalid && productForm.get('smallImageUrl')?.touched) {
-                <div class="invalid-feedback">Small image URL is required</div>
+              @if ((productForm.get('smallImageUrl')?.invalid && productForm.get('smallImageUrl')?.touched) || hasServerError('smallImageUrl')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('smallImageUrl')) {
+                    {{ getServerError('smallImageUrl') }}
+                  } @else {
+                    Small image URL is required
+                  }
+                </div>
               }
             </div>
 
@@ -149,12 +187,18 @@
                 id="bigImageUrl"
                 type="url"
                 formControlName="bigImageUrl"
-                [class.is-invalid]="productForm.get('bigImageUrl')?.invalid && productForm.get('bigImageUrl')?.touched"
+                [class.is-invalid]="(productForm.get('bigImageUrl')?.invalid && productForm.get('bigImageUrl')?.touched) || hasServerError('bigImageUrl')"
                 class="form-control"
                 required
               />
-              @if (productForm.get('bigImageUrl')?.invalid && productForm.get('bigImageUrl')?.touched) {
-                <div class="invalid-feedback">Big image URL is required</div>
+              @if ((productForm.get('bigImageUrl')?.invalid && productForm.get('bigImageUrl')?.touched) || hasServerError('bigImageUrl')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('bigImageUrl')) {
+                    {{ getServerError('bigImageUrl') }}
+                  } @else {
+                    Big image URL is required
+                  }
+                </div>
               }
             </div>
 

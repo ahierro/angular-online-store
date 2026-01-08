@@ -145,3 +145,24 @@ export interface UserInfo {
   isAdmin: boolean;
 }
 
+export interface ValidationError {
+  objectName: string;
+  field: string;
+  rejectedValue: unknown;
+  codes: string[];
+  arguments: unknown[];
+  bindingFailure: boolean;
+  code: string;
+  defaultMessage: string;
+}
+
+export interface BackendErrorResponse {
+  timestamp: string;
+  status: number;
+  error: string;
+  trace?: string;
+  message: string;
+  errors?: ValidationError[];
+  path: string;
+}
+

@@ -20,7 +20,7 @@
                   type="text"
                   formControlName="id"
                   [disabled]="editMode()"
-                  [class.is-invalid]="categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched"
+                  [class.is-invalid]="(categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched) || hasServerError('id')"
                   class="form-control"
                   required
                 />
@@ -35,9 +35,11 @@
                   </button>
                 }
               </div>
-              @if (categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched) {
+              @if ((categoryForm.get('id')?.invalid && categoryForm.get('id')?.touched) || hasServerError('id')) {
                 <div class="invalid-feedback d-block">
-                  @if (categoryForm.get('id')?.hasError('required')) {
+                  @if (hasServerError('id')) {
+                    {{ getServerError('id') }}
+                  } @else if (categoryForm.get('id')?.hasError('required')) {
                     Category ID is required
                   } @else if (categoryForm.get('id')?.hasError('invalidUuid')) {
                     Category ID must be a valid UUID v4
@@ -52,12 +54,18 @@
                 id="name"
                 type="text"
                 formControlName="name"
-                [class.is-invalid]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+                [class.is-invalid]="(categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) || hasServerError('name')"
                 class="form-control"
                 required
               />
-              @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
-                <div class="invalid-feedback">Category name is required</div>
+              @if ((categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) || hasServerError('name')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('name')) {
+                    {{ getServerError('name') }}
+                  } @else {
+                    Category name is required
+                  }
+                </div>
               }
             </div>
 
@@ -67,12 +75,18 @@
                 id="description"
                 formControlName="description"
                 rows="4"
-                [class.is-invalid]="categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched"
+                [class.is-invalid]="(categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched) || hasServerError('description')"
                 class="form-control"
                 required
               ></textarea>
-              @if (categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched) {
-                <div class="invalid-feedback">Description is required</div>
+              @if ((categoryForm.get('description')?.invalid && categoryForm.get('description')?.touched) || hasServerError('description')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('description')) {
+                    {{ getServerError('description') }}
+                  } @else {
+                    Description is required
+                  }
+                </div>
               }
             </div>
 

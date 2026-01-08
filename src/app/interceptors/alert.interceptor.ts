@@ -1,6 +1,6 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { tap, catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { AlertService } from '../services/alert.service';
 
@@ -26,26 +26,61 @@ export const alertInterceptor: HttpInterceptorFn = (req, next) => {
   let alertShown = false;
 
   return next(req).pipe(
-    tap(() => {
-      // Success case - prevent duplicate alerts
-      if (alertShown) return;
-      
-      const now = Date.now();
-      let message = 'Operation completed successfully';
-      
-      // Customize message based on method
-      if (method === 'POST') {
-        message = 'Created successfully';
-      } else if (method === 'PATCH' || method === 'PUT') {
-        message = 'Updated successfully';
-      }
+    map((response: unknown) => {
+      // Handle both cases: HttpResponse (when observe: 'response' is used) 
+      // or body directly (default behavior for 2xx responses)
+      if (response instanceof HttpResponse) {
+        // We have the full HttpResponse - check status code explicitly
+        const status = response.status;
+        
+        // Only show success for actual success status codes (2xx)
+        if (status >= 200 && status < 300 && !alertShown) {
+          const now = Date.now();
+          let message = 'Operation completed successfully';
+          
+          // Customize message based on method
+          if (method === 'POST') {
+            message = 'Created successfully';
+          } else if (method === 'PATCH' || method === 'PUT') {
+            message = 'Updated successfully';
+          }
 
-      // Debounce: only show if it's a different message or enough time has passed
-      if (message !== lastAlertMessage || now - lastAlertTime > ALERT_DEBOUNCE_MS) {
-        alertService.success(message);
-        lastAlertTime = now;
-        lastAlertMessage = message;
-        alertShown = true;
+          // Debounce: only show if it's a different message or enough time has passed
+          if (message !== lastAlertMessage || now - lastAlertTime > ALERT_DEBOUNCE_MS) {
+            alertService.success(message);
+            lastAlertTime = now;
+            lastAlertMessage = message;
+            alertShown = true;
+          }
+        }
+        
+        // Return the body for downstream consumers (maintains original API)
+        return response.body;
+      } else {
+        // Not an HttpResponse - this means HttpClient emitted the body directly
+        // HttpClient only emits body for 2xx responses, so this is definitely a success
+        // However, to be extra safe, we'll only show success if we haven't already shown an error
+        if (!alertShown) {
+          const now = Date.now();
+          let message = 'Operation completed successfully';
+          
+          // Customize message based on method
+          if (method === 'POST') {
+            message = 'Created successfully';
+          } else if (method === 'PATCH' || method === 'PUT') {
+            message = 'Updated successfully';
+          }
+
+          // Debounce: only show if it's a different message or enough time has passed
+          if (message !== lastAlertMessage || now - lastAlertTime > ALERT_DEBOUNCE_MS) {
+            alertService.success(message);
+            lastAlertTime = now;
+            lastAlertMessage = message;
+            alertShown = true;
+          }
+        }
+        
+        return response;
       }
     }),
     catchError((error: HttpErrorResponse) => {

@@ -1,10 +1,11 @@
 import { Component, signal, ChangeDetectionStrategy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../../services/product.service';
 import { CategoryService } from '../../../services/category.service';
 import { ProductCreationDTO, ProductUpdateDTO, CategoryDTO } from '../../../models/api.models';
+import { handleFormValidationErrors } from '../../../utils/form-error.util';
 
 @Component({
   selector: 'app-product-form',
@@ -48,6 +49,19 @@ export class ProductFormComponent implements OnInit {
     }
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
     return uuidRegex.test(control.value) ? null : { invalidUuid: true };
+  }
+
+  getServerError(controlName: string): string | null {
+    const control = this.productForm.get(controlName);
+    if (control && control.hasError('serverError')) {
+      return control.getError('serverError');
+    }
+    return null;
+  }
+
+  hasServerError(controlName: string): boolean {
+    const control = this.productForm.get(controlName);
+    return control ? control.hasError('serverError') : false;
   }
 
   ngOnInit(): void {
@@ -134,9 +148,13 @@ export class ProductFormComponent implements OnInit {
         next: () => {
           this.router.navigate(['/admin/products']);
         },
-        error: () => {
+        error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage.set('Failed to update product');
+          // Try to handle validation errors first
+          if (!handleFormValidationErrors(error, this.productForm)) {
+            // If no validation errors were handled, show generic error
+            this.errorMessage.set('Failed to update product');
+          }
         }
       });
     } else {
@@ -155,9 +173,13 @@ export class ProductFormComponent implements OnInit {
         next: () => {
           this.router.navigate(['/admin/products']);
         },
-        error: () => {
+        error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage.set('Failed to create product');
+          // Try to handle validation errors first
+          if (!handleFormValidationErrors(error, this.productForm)) {
+            // If no validation errors were handled, show generic error
+            this.errorMessage.set('Failed to create product');
+          }
         }
       });
     }
