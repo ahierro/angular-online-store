@@ -11,13 +11,22 @@
             </div>
           }
 
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <form 
+            #loginFormElement
+            [formGroup]="loginForm" 
+            (ngSubmit)="onSubmit($event)"
+            method="post"
+            action="http://localhost:8080/api/login"
+            enctype="application/x-www-form-urlencoded"
+          >
             <div class="mb-3">
               <label for="username" class="form-label">Username</label>
               <input
                 id="username"
+                name="username"
                 type="text"
                 formControlName="username"
+                autocomplete="username"
                 [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
                 class="form-control"
                 required
@@ -31,8 +40,10 @@
               <label for="password" class="form-label">Password</label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 formControlName="password"
+                autocomplete="current-password"
                 [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
                 class="form-control"
                 required

@@ -1,7 +1,23 @@
 <div class="container-fluid mt-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Categories Management</h1>
-    <a routerLink="/admin/categories/new" class="btn btn-primary">Add New Category</a>
+    <div class="d-flex gap-2 align-items-center">
+      <select
+        id="pageSize"
+        [value]="size()"
+        (change)="onPageSizeChange(+$any($event.target).value)"
+        class="form-select"
+        style="width: auto;"
+        aria-label="Items per page"
+      >
+        <option value="5">5 per page</option>
+        <option value="10">10 per page</option>
+        <option value="25">25 per page</option>
+        <option value="50">50 per page</option>
+        <option value="100">100 per page</option>
+      </select>
+      <a routerLink="/admin/categories/new" class="btn btn-primary">Add New Category</a>
+    </div>
   </div>
 
   @if (loading()) {
@@ -46,29 +62,64 @@
       </div>
     </div>
 
-    @if (total() > 1) {
-      <nav aria-label="Page navigation" class="mt-4">
+    @if (total() >= 1) {
+      <nav aria-label="Categories pagination" class="mt-4">
         <ul class="pagination justify-content-center">
           <li class="page-item" [class.disabled]="page() === 0">
-            <button
-              class="page-link"
-              (click)="goToPage(page() - 1)"
-              [disabled]="page() === 0"
-            >
-              Previous
-            </button>
+            @if (page() === 0) {
+              <span class="page-link">First</span>
+            } @else {
+              <a class="page-link" (click)="goToPage(0); $event.preventDefault()" href="#" aria-label="First">
+                First
+              </a>
+            }
           </li>
-          <li class="page-item">
-            <span class="page-link">Page {{ page() + 1 }} of {{ total() }}</span>
+          <li class="page-item" [class.disabled]="page() === 0">
+            @if (page() === 0) {
+              <span class="page-link">Previous</span>
+            } @else {
+              <a class="page-link" (click)="goToPage(page() - 1); $event.preventDefault()" href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+              </a>
+            }
+          </li>
+          @for (pageNum of pageNumbers(); track pageNum) {
+            @if (pageNum === -1) {
+              <li class="page-item disabled">
+                <span class="page-link">...</span>
+              </li>
+            } @else {
+              <li class="page-item" [class.active]="pageNum === page()">
+                @if (pageNum === page()) {
+                  <span class="page-link">
+                    {{ pageNum + 1 }}
+                    <span class="sr-only">(current)</span>
+                  </span>
+                } @else {
+                  <a class="page-link" (click)="goToPage(pageNum); $event.preventDefault()" href="#">{{ pageNum + 1 }}</a>
+                }
+              </li>
+            }
+          }
+          <li class="page-item" [class.disabled]="page() >= total() - 1">
+            @if (page() >= total() - 1) {
+              <span class="page-link">Next</span>
+            } @else {
+              <a class="page-link" (click)="goToPage(page() + 1); $event.preventDefault()" href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+              </a>
+            }
           </li>
           <li class="page-item" [class.disabled]="page() >= total() - 1">
-            <button
-              class="page-link"
-              (click)="goToPage(page() + 1)"
-              [disabled]="page() >= total() - 1"
-            >
-              Next
-            </button>
+            @if (page() >= total() - 1) {
+              <span class="page-link">Last</span>
+            } @else {
+              <a class="page-link" (click)="goToPage(total() - 1); $event.preventDefault()" href="#" aria-label="Last">
+                Last
+              </a>
+            }
           </li>
         </ul>
       </nav>

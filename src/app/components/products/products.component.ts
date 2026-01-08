@@ -29,6 +29,7 @@ export class ProductsComponent implements OnInit {
   private cart = signal<CartItem[]>([]);
   private currentPage = signal(0);
   private totalPages = signal(0);
+  private pageSize = signal(10);
   private isLoading = signal(false);
   private searchQuery = signal('');
   private selectedCategoryId = signal<string | null>(null);
@@ -39,6 +40,7 @@ export class ProductsComponent implements OnInit {
   cartItems = this.cart.asReadonly();
   page = this.currentPage.asReadonly();
   total = this.totalPages.asReadonly();
+  size = this.pageSize.asReadonly();
   loading = this.isLoading.asReadonly();
   search = this.searchQuery.asReadonly();
   selectedCategory = this.selectedCategoryId.asReadonly();
@@ -50,6 +52,41 @@ export class ProductsComponent implements OnInit {
 
   cartItemCount = computed(() => {
     return this.cart().reduce((sum, item) => sum + item.quantity, 0);
+  });
+
+  pageNumbers = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+    
+    if (total <= 7) {
+      // Show all pages if 7 or fewer
+      for (let i = 0; i < total; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show first page, last page, current page, and pages around current
+      pages.push(0);
+      
+      if (current > 2) {
+        pages.push(-1); // Ellipsis marker
+      }
+      
+      const start = Math.max(1, current - 1);
+      const end = Math.min(total - 2, current + 1);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+      
+      if (current < total - 3) {
+        pages.push(-1); // Ellipsis marker
+      }
+      
+      pages.push(total - 1);
+    }
+    
+    return pages;
   });
 
   isAdmin = this.authService.isAdmin;
@@ -73,7 +110,7 @@ export class ProductsComponent implements OnInit {
     this.productService
       .getProducts({
         page: this.currentPage(),
-        size: 12,
+        size: this.pageSize(),
         categoryId: this.selectedCategoryId() || undefined,
         queryString: this.searchQuery() || undefined,
         sortByPrice: this.sortByPrice() || undefined
@@ -162,6 +199,12 @@ export class ProductsComponent implements OnInit {
 
   goToPage(page: number): void {
     this.currentPage.set(page);
+    this.loadProducts();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(0);
     this.loadProducts();
   }
 }

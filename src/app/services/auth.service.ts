@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { LoginRequest, RegisterUserDTO, UserInfo } from '../models/api.models';
@@ -26,7 +26,17 @@ export class AuthService {
   ) {}
 
   login(credentials: LoginRequest): Observable<string> {
-    return this.http.post<string>(`${this.API_URL}/login`, credentials, {
+    // Convert credentials to URL-encoded form data
+    const body = new HttpParams()
+      .set('username', credentials.username)
+      .set('password', credentials.password);
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded'
+    });
+
+    return this.http.post<string>(`${this.API_URL}/login`, body.toString(), {
+      headers,
       responseType: 'text' as 'json'
     }).pipe(
       tap((token) => {
