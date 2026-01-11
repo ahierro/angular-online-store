@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { handleFormValidationErrors } from '../../utils/form-error.util';
 
 @Component({
   selector: 'app-signup',
@@ -23,6 +24,19 @@ export class SignupComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+
+  getServerError(controlName: string): string | null {
+    const control = this.signupForm.get(controlName);
+    if (control && control.hasError('serverError')) {
+      return control.getError('serverError');
+    }
+    return null;
+  }
+
+  hasServerError(controlName: string): boolean {
+    const control = this.signupForm.get(controlName);
+    return control ? control.hasError('serverError') : false;
+  }
 
   signupForm = this.fb.group({
     username: ['', [Validators.required, Validators.minLength(1)]],
@@ -57,15 +71,19 @@ export class SignupComponent {
         this.successMessage.set(
           'Account created successfully! Please check your email to confirm your account before logging in.'
         );
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 3000);
       },
       error: (error) => {
         this.isLoading.set(false);
-        this.errorMessage.set(
-          error.error?.message || 'Failed to create account. Please try again.'
-        );
+        // Try to handle validation errors first
+        if (handleFormValidationErrors(error, this.signupForm)) {
+          // Validation errors were handled and displayed on fields, clear any generic error message
+          this.errorMessage.set(null);
+        } else {
+          // If no validation errors were handled, show generic error
+          this.errorMessage.set(
+            error.error?.message || 'Failed to create account. Please try again.'
+          );
+        }
       }
     });
   }

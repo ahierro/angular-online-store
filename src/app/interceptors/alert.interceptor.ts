@@ -19,7 +19,7 @@ export const alertInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   // Skip alert interceptor for login requests
-  if (req.url.includes('/login')) {
+  if (req.url.includes('/login') || req.url.includes('/signup')) {
     return next(req);
   }
 

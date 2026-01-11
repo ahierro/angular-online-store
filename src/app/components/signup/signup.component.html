@@ -24,12 +24,18 @@
                 id="username"
                 type="text"
                 formControlName="username"
-                [class.is-invalid]="signupForm.get('username')?.invalid && signupForm.get('username')?.touched"
+                [class.is-invalid]="(signupForm.get('username')?.invalid && signupForm.get('username')?.touched) || hasServerError('username')"
                 class="form-control"
                 required
               />
-              @if (signupForm.get('username')?.invalid && signupForm.get('username')?.touched) {
-                <div class="invalid-feedback">Username is required</div>
+              @if ((signupForm.get('username')?.invalid && signupForm.get('username')?.touched) || hasServerError('username')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('username')) {
+                    {{ getServerError('username') }}
+                  } @else {
+                    Username is required
+                  }
+                </div>
               }
             </div>
 
@@ -39,13 +45,15 @@
                 id="email"
                 type="email"
                 formControlName="email"
-                [class.is-invalid]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched"
+                [class.is-invalid]="(signupForm.get('email')?.invalid && signupForm.get('email')?.touched) || hasServerError('email')"
                 class="form-control"
                 required
               />
-              @if (signupForm.get('email')?.invalid && signupForm.get('email')?.touched) {
+              @if ((signupForm.get('email')?.invalid && signupForm.get('email')?.touched) || hasServerError('email')) {
                 <div class="invalid-feedback">
-                  @if (signupForm.get('email')?.hasError('required')) {
+                  @if (hasServerError('email')) {
+                    {{ getServerError('email') }}
+                  } @else if (signupForm.get('email')?.hasError('required')) {
                     Email is required
                   } @else if (signupForm.get('email')?.hasError('email')) {
                     Invalid email format
@@ -61,12 +69,18 @@
                   id="firstName"
                   type="text"
                   formControlName="firstName"
-                  [class.is-invalid]="signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched"
+                  [class.is-invalid]="(signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched) || hasServerError('firstName')"
                   class="form-control"
                   required
                 />
-                @if (signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched) {
-                  <div class="invalid-feedback">First name is required</div>
+                @if ((signupForm.get('firstName')?.invalid && signupForm.get('firstName')?.touched) || hasServerError('firstName')) {
+                  <div class="invalid-feedback">
+                    @if (hasServerError('firstName')) {
+                      {{ getServerError('firstName') }}
+                    } @else {
+                      First name is required
+                    }
+                  </div>
                 }
               </div>
 
@@ -76,12 +90,18 @@
                   id="lastName"
                   type="text"
                   formControlName="lastName"
-                  [class.is-invalid]="signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched"
+                  [class.is-invalid]="(signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched) || hasServerError('lastName')"
                   class="form-control"
                   required
                 />
-                @if (signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched) {
-                  <div class="invalid-feedback">Last name is required</div>
+                @if ((signupForm.get('lastName')?.invalid && signupForm.get('lastName')?.touched) || hasServerError('lastName')) {
+                  <div class="invalid-feedback">
+                    @if (hasServerError('lastName')) {
+                      {{ getServerError('lastName') }}
+                    } @else {
+                      Last name is required
+                    }
+                  </div>
                 }
               </div>
             </div>
@@ -92,25 +112,19 @@
                 id="password"
                 type="password"
                 formControlName="password"
-                [class.is-invalid]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched"
+                [class.is-invalid]="(signupForm.get('password')?.invalid && signupForm.get('password')?.touched) || hasServerError('password')"
                 class="form-control"
                 required
               />
-              @if (signupForm.get('password')?.invalid && signupForm.get('password')?.touched) {
-                <div class="invalid-feedback">Password is required</div>
+              @if ((signupForm.get('password')?.invalid && signupForm.get('password')?.touched) || hasServerError('password')) {
+                <div class="invalid-feedback">
+                  @if (hasServerError('password')) {
+                    {{ getServerError('password') }}
+                  } @else {
+                    Password is required
+                  }
+                </div>
               }
-            </div>
-
-            <div class="mb-3 form-check">
-              <input
-                type="checkbox"
-                formControlName="isAdmin"
-                class="form-check-input"
-                id="isAdmin"
-              />
-              <label class="form-check-label" for="isAdmin">
-                Create as admin account
-              </label>
             </div>
 
             <button
