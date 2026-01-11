@@ -11,12 +11,6 @@
             </div>
           }
 
-          @if (success()) {
-            <div class="alert alert-success" role="alert">
-              {{ success() }}
-            </div>
-          }
-
           <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
             <div class="mb-3">
               <label for="username" class="form-label">Username</label>

@@ -14,11 +14,9 @@ import { handleFormValidationErrors } from '../../utils/form-error.util';
 })
 export class SignupComponent {
   private errorMessage = signal<string | null>(null);
-  private successMessage = signal<string | null>(null);
   private isLoading = signal(false);
 
   error = this.errorMessage.asReadonly();
-  success = this.successMessage.asReadonly();
   loading = this.isLoading.asReadonly();
 
   private fb = inject(FormBuilder);
@@ -54,7 +52,6 @@ export class SignupComponent {
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
-    this.successMessage.set(null);
 
     const userData = {
       username: this.signupForm.value.username!,
@@ -68,9 +65,10 @@ export class SignupComponent {
     this.authService.signup(userData).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set(
-          'Account created successfully! Please check your email to confirm your account before logging in.'
-        );
+        const message = 'Account created successfully! Please check your email to confirm your account before logging in.';
+        this.router.navigate(['/signup-success'], {
+          state: { message }
+        });
       },
       error: (error) => {
         this.isLoading.set(false);
