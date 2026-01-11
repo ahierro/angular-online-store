@@ -23,13 +23,13 @@ export class ProductService {
       .set('size', request.size.toString());
 
     if (request.categoryId) {
-      params = params.set('pageRequest.categoryId', request.categoryId);
+      params = params.set('categoryId', request.categoryId);
     }
     if (request.queryString) {
-      params = params.set('pageRequest.queryString', request.queryString);
+      params = params.set('queryString', request.queryString);
     }
     if (request.sortByPrice) {
-      params = params.set('pageRequest.sortByPrice', request.sortByPrice);
+      params = params.set('sortByPrice', request.sortByPrice);
     }
 
     return this.http.get<ProductPage>(`${this.API_URL}/page`, { params });
