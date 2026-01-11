@@ -16,6 +16,7 @@
               <label for="username" class="form-label">Username</label>
               <input
                 id="username"
+                autocomplete="off"
                 type="text"
                 formControlName="username"
                 [class.is-invalid]="(signupForm.get('username')?.invalid && signupForm.get('username')?.touched) || hasServerError('username')"
@@ -105,6 +106,7 @@
               <input
                 id="password"
                 type="password"
+                autocomplete="new-password"
                 formControlName="password"
                 [class.is-invalid]="(signupForm.get('password')?.invalid && signupForm.get('password')?.touched) || hasServerError('password')"
                 class="form-control"
